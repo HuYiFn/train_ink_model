@@ -47,7 +47,7 @@ for layer in model_mobilenet.layers:
 x = model_mobilenet.output
 x = GlobalAveragePooling2D()(x)
 x = Dense(1024, activation='relu')(x)
-predictions = Dense(12, activation='sigmoid')(x)
+predictions = Dense(9, activation='sigmoid')(x)
 model = Model(inputs=model_mobilenet.input, outputs=predictions)
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 # model = Flatten()(model_mobilenet.output)
