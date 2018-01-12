@@ -14,7 +14,7 @@ set_session(tf.Session(config=config))
 batch_size = 32
 num_classes = 9
 epochs = 200
-data_augmentation = False
+data_augmentation = True
 #num_predictions = 20
 
 lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
