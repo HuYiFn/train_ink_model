@@ -2,6 +2,7 @@ import ImageProcess
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications.mobilenet import MobileNet
 from keras.layers import Input,Dense,GlobalAveragePooling2D
+from keras.layers.pooling import AveragePooling2D
 from keras.models import Model
 #from keras.optimizers import SGD
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping, TensorBoard, ModelCheckpoint
@@ -48,7 +49,8 @@ for layer in model_mobilenet.layers:
 x = model_mobilenet.output
 x = GlobalAveragePooling2D()(x)
 x = Dense(1024, activation='relu')(x)
-predictions = Dense(9, activation='sigmoid')(x)
+
+predictions = Dense(9, activation='softmax')(x)
 model = Model(inputs=model_mobilenet.input, outputs=predictions)
 model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 # model = Flatten()(model_mobilenet.output)
@@ -67,14 +69,13 @@ if not data_augmentation:
               callbacks=[lr_reducer, csv_logger, tensor_board, checkpointer])
 else:
     print('Using real-time data augmentation.')
-    ImageDataGenerator()
     # This will do preprocessing and realtime data augmentation:
     datagen = ImageDataGenerator(
         featurewise_center=False,  # set input mean to 0 over the dataset
         samplewise_center=False,  # set each sample mean to 0
         featurewise_std_normalization=False,  # divide inputs by std of the dataset
         samplewise_std_normalization=False,  # divide each input by its std
-        shear_range=0.1,
+        shear_range=0.,
         zca_whitening=False,  # apply ZCA whitening
         zca_epsilon=1e-6,
         rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
@@ -91,6 +92,6 @@ else:
     model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size),
                         steps_per_epoch=X_train.shape[0] // batch_size,
                         #validation_data=(X_test, Y_test),
-                        epochs=epochs, verbose=1, max_q_size=100,
+                        epochs=epochs, #verbose=1, max_q_size=100,
                         callbacks=[lr_reducer, early_stopper, csv_logger, checkpointer])
 model.save('mobilenet.hdf5')
